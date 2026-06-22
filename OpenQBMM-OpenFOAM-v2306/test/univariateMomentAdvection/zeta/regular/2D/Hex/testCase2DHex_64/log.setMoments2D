@@ -1,0 +1,34 @@
+/*---------------------------------------------------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2306                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+Build  : _cafbeeb2-20260127 OPENFOAM=2306 patch=260127 version=2306
+Arch   : "LSB;label=32;scalar=64"
+Exec   : setMoments2D
+Date   : Jun 03 2026
+Time   : 17:54:59
+Host   : ealin40.private.vki.eu
+PID    : 934430
+I/O    : uncollated
+Case   : /raid10/nobackup/ashok/OpenFOAM/ashok-2306/OpenQBMM-OpenFOAM-v2306/test/univariateMomentAdvection/zeta/regular/2D/Hex/testCase2DHex_64
+nProcs : 1
+trapFpe: Floating point exception trapping enabled (FOAM_SIGFPE).
+fileModificationChecking : Monitoring run-time modified files using timeStampMaster (fileModificationSkew 5, maxFileModificationPolls 20)
+allowSystemOperations : Allowing user-supplied system call operations
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+Create time
+
+Create mesh for time = 0
+
+Reading setMoments2DDict
+
+Number of moments to initialize: 4
+Initialising moments...
+Writing moments...
+
+End
+
