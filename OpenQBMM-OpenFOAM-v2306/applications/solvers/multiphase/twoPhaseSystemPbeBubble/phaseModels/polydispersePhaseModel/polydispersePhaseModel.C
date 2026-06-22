@@ -593,6 +593,7 @@ Foam::polydispersePhaseModel::polydispersePhaseModel
     ds_(nNodes_),
     maxD_("maxD", dimLength, phaseDict_),
     minD_("minD", dimLength, phaseDict_),
+    d32_("d32", dimLength, phaseDict_), //Sauter mean diameter, [NEW ADDITION]
     minLocalDt_(readScalar(pbeDict_.subDict("odeCoeffs").lookup("minLocalDt"))),
     localDt_(this->size(), fluid.mesh().time().deltaT().value()/10.0),
     ATol_(readScalar(pbeDict_.subDict("odeCoeffs").lookup("ATol"))),
@@ -855,8 +856,17 @@ void Foam::polydispersePhaseModel::correct()
         d_ /= Foam::max((*this), residualAlpha_);
         d_.max(minD_);
     }
-}
+    
+    // Calculation for sauter mean diameter [NEW ADDITION]
+    void Foam::polydispersePhaseModel::correctDiameter()
+    {
+        const volScalarField& m2 = quadrature_.moments()[2];
+        const volScalarField& m3 = quadrature_.moments()[3];
 
+        d32_ = m3 / max(m2, dimensionedScalar("dSmall", m2.dimensions(), SMALL));
+        d32_ = min(max(d32_, dMin_), dMax_);
+    }
+}
 
 void Foam::polydispersePhaseModel::relativeTransport()
 {

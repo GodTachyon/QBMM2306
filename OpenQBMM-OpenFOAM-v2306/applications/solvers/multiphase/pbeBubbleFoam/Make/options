@@ -36,7 +36,7 @@ EXE_INC = \
     -I$(QBMM_SRC)/quadratureMethods/PDFTransportModels/lnInclude \
     -I$(QBMM_SRC)/quadratureMethods/populationBalanceModels/lnInclude \
     -I$(QBMM_SRC)/Vandermonde/lnInclude \
-    -I../twoPhaseSystem/lnInclude \
+    -I../twoPhaseSystemPbeBubble/lnInclude \
     -I../phaseCompressibleTurbulenceModels/lnInclude \
     -I../interfacialModels/lnInclude
 

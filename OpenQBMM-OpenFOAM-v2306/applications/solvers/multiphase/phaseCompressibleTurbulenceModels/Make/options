@@ -14,6 +14,7 @@ LIB_THERMO_TOOLS :=
 #endif
 
 EXE_INC = \
+    -I../twoPhaseSystemPbeBubble/lnInclude \
     -I../twoPhaseSystem/lnInclude \
     -I../interfacialModels/lnInclude \
     -I$(LIB_SRC)/transportModels/compressible/lnInclude \

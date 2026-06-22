@@ -9,6 +9,7 @@ wmake $targetType twoPhaseSystem
 wmake $targetType interfacialModels
 wmake $targetType phaseCompressibleTurbulenceModels
 wmake $targetType polydisperseBubbleFoam
+wmake $targetType pbeBubbleFoam
 wmake $targetType denseAGFoam
 
 #------------------------------------------------------------------------------
