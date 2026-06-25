@@ -594,6 +594,7 @@ Foam::polydispersePhaseModel::polydispersePhaseModel
     maxD_("maxD", dimLength, phaseDict_),
     minD_("minD", dimLength, phaseDict_),
     d32_("d32", dimLength, phaseDict_), //Sauter mean diameter, [NEW ADDITION]
+    singleVelocity_(pbeDict_.lookupOrDefault("singleVelocity", false)), // check for looping into velocity moments, [NEW ADDITION]
     minLocalDt_(readScalar(pbeDict_.subDict("odeCoeffs").lookup("minLocalDt"))),
     localDt_(this->size(), fluid.mesh().time().deltaT().value()/10.0),
     ATol_(readScalar(pbeDict_.subDict("odeCoeffs").lookup("ATol"))),
@@ -856,16 +857,16 @@ void Foam::polydispersePhaseModel::correct()
         d_ /= Foam::max((*this), residualAlpha_);
         d_.max(minD_);
     }
-    
-    // Calculation for sauter mean diameter [NEW ADDITION]
-    void Foam::polydispersePhaseModel::correctDiameter()
-    {
-        const volScalarField& m2 = quadrature_.moments()[2];
-        const volScalarField& m3 = quadrature_.moments()[3];
+}
 
-        d32_ = m3 / max(m2, dimensionedScalar("dSmall", m2.dimensions(), SMALL));
-        d32_ = min(max(d32_, dMin_), dMax_);
-    }
+// Calculation for sauter mean diameter [NEW ADDITION]
+void Foam::polydispersePhaseModel::correctDiameter()
+{
+    const volScalarField& m2 = quadrature_.moments()[2];
+    const volScalarField& m3 = quadrature_.moments()[3];
+
+    d32_ = m3 / max(m2, dimensionedScalar("dSmall", m2.dimensions(), SMALL));
+    d32_ = min(max(d32_, minD_), maxD_);
 }
 
 void Foam::polydispersePhaseModel::relativeTransport()
@@ -1010,14 +1011,15 @@ void Foam::polydispersePhaseModel::relativeTransport()
 
 void Foam::polydispersePhaseModel::averageTransport
 (
-    const PtrList<fvVectorMatrix>& AEqns
+    const PtrList<fvVectorMatrix>& AEqns,
+    const surfaceScalarField& phiGas //variable to pass the gas flux
 )
 {
     // Correct mean flux
     const PtrList<surfaceScalarNode>& nodesOwn = quadrature_.nodesOwn();
     const PtrList<surfaceScalarNode>& nodesNei = quadrature_.nodesNei();
-    dimensionedScalar zeroPhi("zero", phiPtr_().dimensions(), 0.0);
-    surfaceScalarField phi(phiPtr_());
+    surfaceScalarField phi(phiGas); // call gas flux
+    surfaceScalarField phi(fluid_.(otherPhase(*this).phi())); // pointer to gas flux
 
     const dictionary& pimpleDict =
         fluid_.mesh().solutionDict().subDict("PIMPLE");
@@ -1086,7 +1088,8 @@ void Foam::polydispersePhaseModel::averageTransport
         }
     }
     quadrature_.interpolateNodes();
-
+   if(!singleVeloity_) // Begin if loop here for velocity moments
+   {
     // Mean moment advection
     Info<< "Transporting moments with average velocity" << endl;
     forAll(quadrature_.moments(), mEqni)
@@ -1208,7 +1211,7 @@ void Foam::polydispersePhaseModel::averageTransport
         UpEqn.relax();
         UpEqn.solve();
     }
-
+   
     quadrature_.updateAllQuadrature();
 
     // Solve for velocity abscissa directly since the momentum exchange
@@ -1248,7 +1251,7 @@ void Foam::polydispersePhaseModel::averageTransport
         UsEqn.relax();
         UsEqn.solve();
     }
-    
+   } // end if loop here for velocity 
     quadrature_.updateAllMoments();
 
     // Update moments with breakup and coalescence sources

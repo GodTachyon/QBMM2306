@@ -49,6 +49,14 @@ namespace Foam
         dictionary,
         polydispersePhaseModel
     );
+    // new addition to phase model for pbeBubbleFoam
+    addNamedToRunTimeSelectionTable
+    (
+        phaseModel,
+        pbeBubblePhaseModel,
+        dictionary,
+        pbeBubblePhaseModel
+    );
 }
 
 // ************************************************************************* //
