@@ -151,9 +151,6 @@ class polydispersePhaseModel
 
         //- Update moments
         void updateVelocity();
-        
-        //- Use single gas velocity for moment transport (no velocity moments), [NEW ADDITION]
-	bool singleVelocity_;
 
         //- Coalescence source
         scalar coalescenceSource(const label celli, const label momentOrder);
@@ -232,6 +229,9 @@ public:
         {
             return Vs_[nodei];
         }
+        
+        //- Use single gas velocity for moment transport (no velocity moments), [NEW ADDITION]
+	bool singleVelocity_;
         
         //- Correct the phase diameter to mean diameter from moments [NEW ADDITION]
         virtual void correctDiameter();

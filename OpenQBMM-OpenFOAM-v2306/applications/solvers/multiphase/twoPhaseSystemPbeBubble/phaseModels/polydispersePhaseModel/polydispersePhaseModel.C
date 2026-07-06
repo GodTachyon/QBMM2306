@@ -25,7 +25,7 @@ License
 
 #include "polydispersePhaseModel.H"
 #include "fvMatrix.H"
-#include "twoPhaseSystem.H"
+#include "twoPhaseSystemPbeBubble.H"
 #include "fixedValueFvPatchFields.H"
 #include "cyclicFvPatchFields.H"
 #include "zeroGradientFvPatchFields.H"
@@ -593,8 +593,20 @@ Foam::polydispersePhaseModel::polydispersePhaseModel
     ds_(nNodes_),
     maxD_("maxD", dimLength, phaseDict_),
     minD_("minD", dimLength, phaseDict_),
-    d32_("d32", dimLength, phaseDict_), //Sauter mean diameter, [NEW ADDITION]
-    singleVelocity_(pbeDict_.lookupOrDefault("singleVelocity", false)), // check for looping into velocity moments, [NEW ADDITION]
+//    d32_("d32", dimLength, phaseDict_), //Sauter mean diameter, [NEW ADDITION]
+    d32_
+    (
+        IOobject
+        (
+            "d32",
+            fluid.mesh().time().timeName(),
+            fluid.mesh(),
+            IOobject::NO_READ,
+            IOobject::AUTO_WRITE
+        ),
+        fluid.mesh(),
+        dimensionedScalar("d32", dimLength, minD_.value())
+    ),
     minLocalDt_(readScalar(pbeDict_.subDict("odeCoeffs").lookup("minLocalDt"))),
     localDt_(this->size(), fluid.mesh().time().deltaT().value()/10.0),
     ATol_(readScalar(pbeDict_.subDict("odeCoeffs").lookup("ATol"))),
@@ -605,7 +617,8 @@ Foam::polydispersePhaseModel::polydispersePhaseModel
     validDirections_
     (
         (vector(fluid_.mesh().solutionD()) + vector(1.0, 1.0, 1.0))/2.0
-    )
+    ),
+    singleVelocity_(pbeDict_.lookupOrDefault("singleVelocity", false)) // check for looping into velocity moments, [NEW ADDITION]
 {
     this->d_.writeOpt() = IOobject::AUTO_WRITE;
 
@@ -865,8 +878,13 @@ void Foam::polydispersePhaseModel::correctDiameter()
     const volScalarField& m2 = quadrature_.moments()[2];
     const volScalarField& m3 = quadrature_.moments()[3];
 
-    d32_ = m3 / max(m2, dimensionedScalar("dSmall", m2.dimensions(), SMALL));
-    d32_ = min(max(d32_, minD_), maxD_);
+    d32_ = m3 / Foam::max(m2, dimensionedScalar("dSmall", m2.dimensions(), SMALL)); // have to use the foam namespace for calling the min/max functions
+    d32_ = Foam::min(Foam::max(d32_, minD_), maxD_); // have to use the foam namespace for calling the min/max functions
+    
+        Info<< "d32 (Sauter mean diameter): min = " << Foam::min(d32_).value()
+            << " max = " << Foam::max(d32_).value()
+            << " mean = " << d32_.weightedAverage(d32_.mesh().V()).value()
+            << " m" << endl;
 }
 
 void Foam::polydispersePhaseModel::relativeTransport()
@@ -1019,7 +1037,7 @@ void Foam::polydispersePhaseModel::averageTransport
     const PtrList<surfaceScalarNode>& nodesOwn = quadrature_.nodesOwn();
     const PtrList<surfaceScalarNode>& nodesNei = quadrature_.nodesNei();
     surfaceScalarField phi(phiGas); // call gas flux
-    surfaceScalarField phi(fluid_.(otherPhase(*this).phi())); // pointer to gas flux
+    dimensionedScalar zeroPhi("zero", phiGas.dimensions(), 0.0); //zeroPhi declaration for function use
 
     const dictionary& pimpleDict =
         fluid_.mesh().solutionDict().subDict("PIMPLE");
@@ -1027,6 +1045,18 @@ void Foam::polydispersePhaseModel::averageTransport
     if (corr_.valid())
     {
         volScalarField& corr = corr_.ref();
+        
+        if (singleVelocity_)
+    {
+        Info<< "polydispersePhaseModel: singleVelocity enabled - "
+            << "moment transport will use gas-phase flux, "
+            << "velocity moment equations skipped." << endl;
+    }
+    else
+    {
+        Info<< "polydispersePhaseModel: singleVelocity disabled - "
+            << "using velocity-moment-reconstructed flux." << endl;
+    }
 
         for (label i = 0; i < nCorrectors; i++)
         {
@@ -1088,7 +1118,7 @@ void Foam::polydispersePhaseModel::averageTransport
         }
     }
     quadrature_.interpolateNodes();
-   if(!singleVeloity_) // Begin if loop here for velocity moments
+   if(!singleVelocity_) // Begin if loop here for velocity moments
    {
     // Mean moment advection
     Info<< "Transporting moments with average velocity" << endl;
