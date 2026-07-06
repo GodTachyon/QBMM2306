@@ -27,7 +27,7 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "phaseModel.H"
-#include "twoPhaseSystem.H"
+#include "twoPhaseSystemPbeBubble.H"
 #include "fvMatrix.H"
 #include "PhaseCompressibleTurbulenceModel.H"
 #include "dragModel.H"

@@ -27,6 +27,7 @@ License
 
 #include "phaseModel.H"
 #include "polydispersePhaseModel.H"
+#include "pbeBubblePhaseModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -49,6 +50,7 @@ namespace Foam
         dictionary,
         polydispersePhaseModel
     );
+    
     // new addition to phase model for pbeBubbleFoam
     addNamedToRunTimeSelectionTable
     (

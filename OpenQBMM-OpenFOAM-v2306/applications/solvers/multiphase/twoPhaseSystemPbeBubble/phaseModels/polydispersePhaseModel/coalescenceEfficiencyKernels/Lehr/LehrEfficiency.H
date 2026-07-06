@@ -64,7 +64,7 @@ SourceFiles
 #define LehrEfficiency_H
 
 #include "coalescenceEfficiencyKernel.H"
-#include "twoPhaseSystem.H"
+#include "twoPhaseSystemPbeBubble.H"
 #include "phaseModel.H"
 #include "PhaseCompressibleTurbulenceModel.H"
 

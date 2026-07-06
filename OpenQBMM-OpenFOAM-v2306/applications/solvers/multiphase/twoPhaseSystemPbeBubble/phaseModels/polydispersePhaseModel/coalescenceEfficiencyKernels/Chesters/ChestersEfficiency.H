@@ -72,7 +72,7 @@ SourceFiles
 #define ChestersEfficiency_H
 
 #include "coalescenceEfficiencyKernel.H"
-#include "twoPhaseSystem.H"
+#include "twoPhaseSystemPbeBubble.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

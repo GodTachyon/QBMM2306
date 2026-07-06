@@ -76,7 +76,7 @@ SourceFiles
 #define PrinceAndBlanchFrequency_H
 
 #include "coalescenceFrequencyKernel.H"
-#include "twoPhaseSystem.H"
+#include "twoPhaseSystemPbeBubble.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -57,7 +57,7 @@ SourceFiles
 #define CoulaloglouAndTavlaridesFrequency_H
 
 #include "coalescenceFrequencyKernel.H"
-#include "twoPhaseSystem.H"
+#include "twoPhaseSystemPbeBubble.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

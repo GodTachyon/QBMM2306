@@ -67,7 +67,7 @@ SourceFiles
 #define LuoSvendsenBubble_H
 
 #include "breakupKernel.H"
-#include "twoPhaseSystem.H"
+#include "twoPhaseSystemPbeBubble.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

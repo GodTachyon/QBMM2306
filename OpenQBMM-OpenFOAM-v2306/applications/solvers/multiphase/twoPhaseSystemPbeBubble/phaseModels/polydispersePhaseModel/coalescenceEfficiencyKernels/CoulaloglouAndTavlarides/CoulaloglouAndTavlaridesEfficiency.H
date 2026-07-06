@@ -68,7 +68,7 @@ SourceFiles
 #define CoulaloglouAndTavlaridesEfficiency_H
 
 #include "coalescenceEfficiencyKernel.H"
-#include "twoPhaseSystem.H"
+#include "twoPhaseSystemPbeBubble.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
