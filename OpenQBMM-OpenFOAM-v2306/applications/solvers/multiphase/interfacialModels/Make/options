@@ -35,4 +35,5 @@ LIB_LIBS = \
     -lcompressibleTurbulenceModels \
     $(LIB_THERMO_TOOLS) \
     -L$(FOAM_MODULE_LIBBIN) \
+    -lpdPhaseSystemPbe \
     -lpdPhaseSystem

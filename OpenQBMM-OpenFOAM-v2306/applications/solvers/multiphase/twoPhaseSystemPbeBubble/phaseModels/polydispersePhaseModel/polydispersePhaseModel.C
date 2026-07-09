@@ -617,8 +617,8 @@ Foam::polydispersePhaseModel::polydispersePhaseModel
     validDirections_
     (
         (vector(fluid_.mesh().solutionD()) + vector(1.0, 1.0, 1.0))/2.0
-    ),
-    singleVelocity_(pbeDict_.lookupOrDefault("singleVelocity", false)) // check for looping into velocity moments, [NEW ADDITION]
+    )
+    
 {
     this->d_.writeOpt() = IOobject::AUTO_WRITE;
 
@@ -1045,18 +1045,6 @@ void Foam::polydispersePhaseModel::averageTransport
     if (corr_.valid())
     {
         volScalarField& corr = corr_.ref();
-        
-        if (singleVelocity_)
-    {
-        Info<< "polydispersePhaseModel: singleVelocity enabled - "
-            << "moment transport will use gas-phase flux, "
-            << "velocity moment equations skipped." << endl;
-    }
-    else
-    {
-        Info<< "polydispersePhaseModel: singleVelocity disabled - "
-            << "using velocity-moment-reconstructed flux." << endl;
-    }
 
         for (label i = 0; i < nCorrectors; i++)
         {
@@ -1118,7 +1106,7 @@ void Foam::polydispersePhaseModel::averageTransport
         }
     }
     quadrature_.interpolateNodes();
-   if(!singleVelocity_) // Begin if loop here for velocity moments
+   
    {
     // Mean moment advection
     Info<< "Transporting moments with average velocity" << endl;

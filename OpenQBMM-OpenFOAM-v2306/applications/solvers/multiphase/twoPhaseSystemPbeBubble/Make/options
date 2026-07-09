@@ -11,7 +11,7 @@ endif
 QBMM_SRC := ../../../../src
 
 EXE_INC = \
-    -I../twoPhaseSystem \
+    -I../twoPhaseSystemPbeBubble \
     -I../interfacialModels/lnInclude \
     -I../phaseCompressibleTurbulenceModels/lnInclude \
     -I$(LIB_SRC)/transportModels/compressible/lnInclude \

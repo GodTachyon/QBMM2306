@@ -62,6 +62,6 @@ EXE_LIBS = \
     -lmomentAdvection \
     -lpopulationBalance \
     -lvandermonde \
-    -lpdPhaseSystem \
+    -lpdPhaseSystemPbe \
     -lpdTurbulenceModels \
     -lpdEulerianInterfacialModels

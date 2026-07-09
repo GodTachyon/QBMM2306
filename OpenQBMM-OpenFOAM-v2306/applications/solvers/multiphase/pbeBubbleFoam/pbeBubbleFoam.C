@@ -38,7 +38,7 @@ Description
 #include "fvCFD.H"
 #include "pimpleControl.H"
 #include "fvOptions.H"
-#include "twoPhaseSystem.H"
+#include "twoPhaseSystemPbeBubble.H"
 #include "PhaseCompressibleTurbulenceModel.H"
 #include "fixedValueFvsPatchFields.H"
 
@@ -89,10 +89,7 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        {
-            // Transport moments with velocities relative to the mean gas
-            // velocity
-            fluid.relativeTransport();
+      {
 
             // Solve for mean phase velocities and gas volume fraction
             while (pimple.loop())

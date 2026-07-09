@@ -6,6 +6,7 @@ cd "${0%/*}" || exit                            # Run from this directory
 wmakeLnInclude interfacialModels
 
 wmake $targetType twoPhaseSystem
+wmake $targetType twoPhaseSystemPbeBubble
 wmake $targetType interfacialModels
 wmake $targetType phaseCompressibleTurbulenceModels
 wmake $targetType polydisperseBubbleFoam

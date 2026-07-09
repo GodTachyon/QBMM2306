@@ -208,9 +208,6 @@ public:
 
         //- Solve for the two-phase-fractions
         void solve();
-        
-        //- pass through declaration for correcting flux in solve step
-        bool singleVelocity() const { return singleVelocity };
 
         //- Solve average transport of moments
         void averageTransport();

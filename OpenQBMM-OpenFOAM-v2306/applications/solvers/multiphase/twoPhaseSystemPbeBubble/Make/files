@@ -26,6 +26,6 @@ phasePair/phasePairKey/phasePairKey.C
 phasePair/phasePair/phasePair.C
 phasePair/orderedPhasePair/orderedPhasePair.C
 
-twoPhaseSystem.C
+twoPhaseSystemPbeBubble.C
 
-LIB = $(FOAM_MODULE_LIBBIN)/libpdPhaseSystem
+LIB = $(FOAM_MODULE_LIBBIN)/libpdPhaseSystemPbe

@@ -863,12 +863,6 @@ void Foam::twoPhaseSystem::solve()
     }
 }
 
-// phase declaration for selecting gas flux in moment solver [NEW ADDITION]
-bool Foam::twoPhaseSystem::singleVelocity() const
-{
-    return phase1_.singleVelocity();
-}
-
 void Foam::twoPhaseSystem::relativeTransport()
 {
     if (nNodes_ > 1)
