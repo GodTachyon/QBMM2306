@@ -40,7 +40,7 @@ License
 
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
+/* [NOT NEEDED]
 void Foam::polydispersePhaseModel::updateVelocity()
 {
     // Correct mean velocity using the new velocity moments
@@ -57,7 +57,7 @@ void Foam::polydispersePhaseModel::updateVelocity()
     alphaPhi_ = fvc::interpolate(*this)*phiPtr_();
     alphaRhoPhi_ = fvc::interpolate(rho())*alphaPhi_;
 }
-
+*/
 
 Foam::scalar Foam::polydispersePhaseModel::coalescenceSource
 (
@@ -797,9 +797,70 @@ Foam::polydispersePhaseModel::~polydispersePhaseModel()
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
+/*
+// Calculation for sauter mean diameter [NEW ADDITION]
+void Foam::polydispersePhaseModel::correctDiameter()
+{
+  //  const volScalarField& m2 = quadrature_.moments()[2];
+ //   const volScalarField& m3 = quadrature_.moments()[3];
 
+ //   d32_ = m3 / Foam::max(m2, dimensionedScalar("dSmall", m2.dimensions(), SMALL)); // have to use the foam namespace for calling the min/max functions
+    d_ = dimensionedScalar("zero", dimLength, 0.0);
+    volScalarField scale
+    (
+        (*this)
+        /Foam::max
+        (
+            quadrature_.moments()[1]/rho(),
+            residualAlpha_
+        )
+    );
+
+    forAll(quadrature_.nodes(), nodei)
+    {
+     const volScalarNode& node = quadrature_.nodes()[nodei];
+
+     // Set alpha values such that the moment.1 is equal to the bounded
+     // alpha
+     alphas_[nodei] =
+         node.primaryWeight()*node.primaryAbscissae()[0]/rho()*scale;
+     alphas_[nodei].max(0);
+     alphas_[nodei].min(1);
+
+     //  Calculate bubble diameter based on bubble mass (abscissa)
+     ds_[nodei] =
+         Foam::min
+         (
+             Foam::max
+             (
+                 Foam::sum
+                 (
+                     node.primaryAbscissae()[0]*Foam::pow(ds_[nodei],3)
+                 )
+                 /
+                 Foam::sum
+                 (
+                     node.primaryAbscissae()[0]*Foam::pow(ds_[nodei],2)
+                 ),
+                 minD_
+             ),
+             maxD_
+         );
+     d_ += alphas_[nodei]*ds_[nodei];
+    }
+    d32_ = Foam::min(Foam::max(d_, minD_), maxD_); // have to use the foam namespace for calling the min/max functions
+    
+        Info<< "d32 (Sauter mean diameter): min = " << Foam::min(d32_).value()
+            << " max = " << Foam::max(d32_).value()
+            << " mean = " << d32_.weightedAverage(d32_.mesh().V()).value()
+            << " m" << endl;
+}
+*/
 void Foam::polydispersePhaseModel::correct()
 {
+
+// Calculation for sauter mean diameter [NEW ADDITION]
+//correctDiameter();
 
     if (nNodes_ == 1)
     {
@@ -821,6 +882,13 @@ void Foam::polydispersePhaseModel::correct()
                 maxD_
             );
         d_ = ds_[0];
+        d32_ = ds_[0];
+
+        Info<< "d32 (Sauter mean diameter): min = " << Foam::min(d32_).value()
+            << " max = " << Foam::max(d32_).value()
+            << " mean = " << d32_.weightedAverage(d32_.mesh().V()).value()
+            << " m" << endl;
+
         return;
     }
     else
@@ -833,6 +901,45 @@ void Foam::polydispersePhaseModel::correct()
             (
                 quadrature_.moments()[1]/rho(),
                 residualAlpha_
+            )
+        );
+        //[NEW ADDITION], d32Num is 3rd Moment and d32Den is 2nd Moment
+        volScalarField d32Num
+        (
+            IOobject
+            (
+                "d32Num",
+                fluid_.mesh().time().timeName(),
+                fluid_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE,
+                false
+            ),
+            fluid_.mesh(),
+            dimensionedScalar
+            (
+                "zero",
+                quadrature_.nodes()[0].primaryWeight().dimensions()*pow3(dimLength),
+                0.0
+            )
+        );
+        volScalarField d32Den
+        (
+            IOobject
+            (
+                "d32Den",
+                fluid_.mesh().time().timeName(),
+                fluid_.mesh(),
+                IOobject::NO_READ,
+                IOobject::NO_WRITE,
+                false
+            ),
+            fluid_.mesh(),
+            dimensionedScalar
+            (
+                "zero",
+                quadrature_.nodes()[0].primaryWeight().dimensions()*sqr(dimLength),
+                0.0
             )
         );
 
@@ -865,26 +972,18 @@ void Foam::polydispersePhaseModel::correct()
                     maxD_
                 );
             d_ += alphas_[nodei]*ds_[nodei];
+            d32_ = d32Num/Foam::max(d32Den, dimensionedScalar("dSmall", d32Den.dimensions(), SMALL));
+            d32_ = Foam::min(Foam::max(d32_, minD_), maxD_);
         }
 
         d_ /= Foam::max((*this), residualAlpha_);
         d_.max(minD_);
-    }
-}
 
-// Calculation for sauter mean diameter [NEW ADDITION]
-void Foam::polydispersePhaseModel::correctDiameter()
-{
-    const volScalarField& m2 = quadrature_.moments()[2];
-    const volScalarField& m3 = quadrature_.moments()[3];
-
-    d32_ = m3 / Foam::max(m2, dimensionedScalar("dSmall", m2.dimensions(), SMALL)); // have to use the foam namespace for calling the min/max functions
-    d32_ = Foam::min(Foam::max(d32_, minD_), maxD_); // have to use the foam namespace for calling the min/max functions
-    
         Info<< "d32 (Sauter mean diameter): min = " << Foam::min(d32_).value()
             << " max = " << Foam::max(d32_).value()
             << " mean = " << d32_.weightedAverage(d32_.mesh().V()).value()
             << " m" << endl;
+    }
 }
 
 void Foam::polydispersePhaseModel::relativeTransport()
@@ -1029,7 +1128,6 @@ void Foam::polydispersePhaseModel::relativeTransport()
 
 void Foam::polydispersePhaseModel::averageTransport
 (
-    const PtrList<fvVectorMatrix>& AEqns,
     const surfaceScalarField& phiGas //variable to pass the gas flux
 )
 {
@@ -1107,7 +1205,7 @@ void Foam::polydispersePhaseModel::averageTransport
     }
     quadrature_.interpolateNodes();
    
-   {
+   
     // Mean moment advection
     Info<< "Transporting moments with average velocity" << endl;
     forAll(quadrature_.moments(), mEqni)
@@ -1161,122 +1259,23 @@ void Foam::polydispersePhaseModel::averageTransport
         mEqn.relax();
         mEqn.solve();
     }
-
-    if (nNodes_ == 1)
+   // [NEW ADDITION] uses base velocity as moment velocity
+   forAll(quadrature_.velocityMoments(), mi)
     {
-        forAll(quadrature_.velocityMoments(), mi)
-        {
-            quadrature_.velocityMoments()[mi] = U_*quadrature_.moments()[mi];
-            quadrature_.velocityMoments()[mi].correctBoundaryConditions();
-        }
-
-        quadrature_.updateQuadrature();
-        Us_[0] = U_;
-        return;
+        quadrature_.velocityMoments()[mi] = U_*quadrature_.moments()[mi];
+        quadrature_.velocityMoments()[mi].correctBoundaryConditions();
     }
-
-    forAll(quadrature_.velocityMoments(), mEqni)
-    {
-        volVectorField& Up = quadrature_.velocityMoments()[mEqni];
-
-        volVectorField meanDivUbUp
-        (
-            IOobject
-            (
-                "meanDivUbUp",
-                fluid_.mesh().time().timeName(),
-                fluid_.mesh()
-            ),
-            fluid_.mesh(),
-            dimensionedVector("zero", Up.dimensions()/dimTime, Zero)
-        );
-
-        for (label nodei = 0; nodei < nNodes_; nodei++)
-        {
-            // Update average velocity moment flux
-            surfaceVectorField aFluxUp
-            (
-                "aFluxUp",
-                quadrature_.velocitiesNei()[nodei]
-               *nodesNei[nodei].primaryWeight()
-               *(
-                    pow
-                    (
-                        nodesNei[nodei].primaryAbscissae()[0],
-                        mEqni
-                    )
-                )*Foam::min(phi, zeroPhi)
-              + quadrature_.velocitiesOwn()[nodei]
-               *nodesOwn[nodei].primaryWeight()
-               *pow
-                (
-                    nodesOwn[nodei].primaryAbscissae()[0],
-                    mEqni
-                )*Foam::max(phi, zeroPhi)
-            );
-
-            meanDivUbUp += fvc::surfaceIntegrate(aFluxUp);
-        }
-
-        // Solve average velocity moment transport Equation
-        fvVectorMatrix UpEqn
-        (
-            fvm::ddt(Up)
-          - fvc::ddt(Up)
-          + meanDivUbUp
-        );
-
-        UpEqn.relax();
-        UpEqn.solve();
-    }
-   
-    quadrature_.updateAllQuadrature();
-
-    // Solve for velocity abscissa directly since the momentum exchange
-    // terms do not change the mass
-    Info << "Solving for velocity abscissae" << endl;
+    quadrature_.updateQuadrature();
 
     forAll(Us_, nodei)
     {
-        //  Colisional time, forces velocities towards mean in the case of
-        //  high volume fractions
-        //  Could be replaced by radial distribution function
-        volScalarField tauC
-        (
-            "tauC",
-            Foam::max
-            (
-                (0.5 + 0.5*tanh(((*this) - 0.63)/0.01))*GREAT,
-                residualAlpha_
-            )
-        );
-
-        tauC.dimensions().reset(dimDensity/dimTime);
-
-        volScalarField alphaRhoi(alphas_[nodei]*rho());
-
-        // Solve for velocities using acceleration terms
-        fvVectorMatrix UsEqn
-        (
-            alphaRhoi*fvm::ddt(Us_[nodei])
-          - alphaRhoi*fvc::ddt(Us_[nodei])
-          + fvm::Sp(tauC, Us_[nodei])
-         ==
-            AEqns[nodei]
-          + tauC*U_
-        );
-
-        UsEqn.relax();
-        UsEqn.solve();
+        Us_[nodei] = U_;
     }
-   } // end if loop here for velocity 
+   
     quadrature_.updateAllMoments();
 
     // Update moments with breakup and coalescence sources
     solveSourceOde();
-
-    //- Update mean velocity
-    this->updateVelocity();
 
     // Update deviation velocity
     forAll(Vs_, nodei)

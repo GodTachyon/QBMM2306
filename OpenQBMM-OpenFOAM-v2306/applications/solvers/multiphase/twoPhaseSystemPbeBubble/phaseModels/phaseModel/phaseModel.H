@@ -445,8 +445,8 @@ public:
             return;
         }
 
-        //- Average transport of moments, not used in standard phase model
-        virtual void averageTransport(const PtrList<fvVectorMatrix>& AEqns)
+        //- Average transport of moments, not used in standard phase model [Changed from Original]
+        virtual void averageTransport(const surfaceScalarField& phiGas)
         {
             return;
         }

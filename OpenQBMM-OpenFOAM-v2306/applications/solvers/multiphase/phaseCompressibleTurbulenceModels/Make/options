@@ -59,4 +59,5 @@ LIB_LIBS = \
     -lhermiteQuadrature \
     -lvandermonde \
     -lpdPhaseSystem \
+    -lpdPhaseSystemPbe \
     -lpdEulerianInterfacialModels

@@ -149,8 +149,8 @@ class polydispersePhaseModel
 
     // Private member functions
 
-        //- Update moments
-        void updateVelocity();
+        //- Update moments [commented to remove out for now]
+       // void updateVelocity();
 
         //- Coalescence source
         scalar coalescenceSource(const label celli, const label momentOrder);
@@ -211,7 +211,7 @@ public:
         {
             return ds_[nodei];
         }
-
+	/* [Removed since this is an override from phaseModel.H, we need the default for now]
         //- Return the velocity for nodei
         virtual const volVectorField& Us(const label nodei) const
         {
@@ -229,15 +229,15 @@ public:
         {
             return Vs_[nodei];
         }
-        
-        //- Use single gas velocity for moment transport (no velocity moments), [NEW ADDITION]
-	bool singleVelocity_;
+        */
+        //- Use single gas velocity for moment transport (no velocity moments), [NEW ADDITION], not needed either
+	//bool singleVelocity_;
         
         //- Correct the phase diameter to mean diameter from moments [NEW ADDITION]
-        virtual void correctDiameter();
+        //virtual void correctDiameter();
         
         // Override base class accessor, for computing the sauter mean diameter [NEW ADDITION]
-	virtual const volScalarField& d() const { return d32_; }
+	    virtual const volScalarField& d() const { return d32_; }
 
         //- Correct the phase properties
         virtual void correct();
@@ -246,7 +246,7 @@ public:
         virtual void relativeTransport();
 
         //- Average transport of moments
-        virtual void averageTransport(const PtrList<fvVectorMatrix>& AEqns, const surfaceScalarField& phiGas); //added call for gas flux [NEW ADDITION]
+        virtual void averageTransport(const surfaceScalarField& phiGas); //added call for gas flux [NEW ADDITION]
 
         //- Read phase properties dictionary
         virtual bool read(const bool readOK);

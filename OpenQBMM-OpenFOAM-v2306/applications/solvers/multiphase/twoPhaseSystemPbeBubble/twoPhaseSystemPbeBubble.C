@@ -878,7 +878,7 @@ void Foam::twoPhaseSystem::averageTransport()
 
     if (nNodes_ == 1)
     {
-        phase1_->averageTransport(AEqns);
+        phase1_->averageTransport(phase1_->phi()); // [NEW ADDITION]
         phase1_->correct();
 
         return;
@@ -894,7 +894,7 @@ void Foam::twoPhaseSystem::averageTransport()
       + fvc::div(phase2_->phi(), phase2_->U())
       - fvc::div(phase2_->phi())*phase2_->U()
     );
-
+    /*
     for (label nodei = 0; nodei < nNodes_; nodei++)
     {
         //  Build matrix to solve for velocity abscissae due to interfacial
@@ -946,8 +946,8 @@ void Foam::twoPhaseSystem::averageTransport()
           + bubblePressure_->F<vector>(nodei, 0);
 
     }
-
-    phase1_->averageTransport(AEqns);
+    */
+    phase1_->averageTransport(phase1_->phi()); // [NEW ADDITION]
     phase1_->correct();
 
     phi_ = phase1_->alphaPhi() + phase2_->alphaPhi();
