@@ -91,8 +91,8 @@ Foam::scalar Foam::polydispersePhaseModel::coalescenceSource
 
             scalar n2 = node2.n(celli, weight2, abscissa2);
             scalar d2 = node2.d(celli, abscissa2);
-            vector Ur = Us_[nodei][celli] - Us_[nodej][celli];
-
+            vector Ur = U_[celli] - otherPhase().U()[celli]; //proposed change to relative velocity based on Ur from pEqn.H
+            
             //- Diameter is used to calculate the coalesence kernel in place
             //  of the abscissa, handled inside kernel
             cSource +=
@@ -146,7 +146,7 @@ Foam::vector Foam::polydispersePhaseModel::coalescenceSourceU
 
             scalar n2 = node2.n(celli, weight2, abscissa2);
             scalar d2 = node2.d(celli, abscissa2);
-            vector Ur = Us_[nodei][celli] - Us_[nodej][celli];
+            vector Ur = U_[celli] - otherPhase().U()[celli]; //change same as in previous coalescenceSource member function
 
             //- Diameter is used to calculate the coalesence kernel in place
             //  of the abscissa, handled inside kernel
@@ -923,7 +923,7 @@ void Foam::polydispersePhaseModel::correct()
                 0.0
             )
         );
-        volScalarField d32Den
+        volScalarField d32Den 
         (
             IOobject
             (
@@ -972,12 +972,15 @@ void Foam::polydispersePhaseModel::correct()
                     maxD_
                 );
             d_ += alphas_[nodei]*ds_[nodei];
-            d32_ = d32Num/Foam::max(d32Den, dimensionedScalar("dSmall", d32Den.dimensions(), SMALL));
-            d32_ = Foam::min(Foam::max(d32_, minD_), maxD_);
+            d32Num += node.primaryWeight()*pow3(ds_[nodei]); // Accumulation of moment 3
+            d32Den += node.primaryWeight()*sqr(ds_[nodei]); // Accumulation of moment 2
         }
 
         d_ /= Foam::max((*this), residualAlpha_);
         d_.max(minD_);
+        
+        d32_ = d32Num/Foam::max(d32Den, dimensionedScalar("dSmall", d32Den.dimensions(), SMALL)); // Finish accumulation per time step
+        d32_ = Foam::min(Foam::max(d32_, minD_), maxD_); // Final value
 
         Info<< "d32 (Sauter mean diameter): min = " << Foam::min(d32_).value()
             << " max = " << Foam::max(d32_).value()
