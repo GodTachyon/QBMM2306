@@ -207,9 +207,11 @@ public:
         }
 
         //- Return the diameter for nodei
+        //  Override to return the Sauter mean diameter so that all
+        //  interfacial force models evaluate using d32
         virtual const volScalarField& ds(const label nodei) const
         {
-            return ds_[nodei];
+            return d32_;
         }
 	/* [Removed since this is an override from phaseModel.H, we need the default for now]
         //- Return the velocity for nodei
@@ -236,9 +238,6 @@ public:
         //- Correct the phase diameter to mean diameter from moments [NEW ADDITION]
         //virtual void correctDiameter();
         
-        // Override base class accessor, for computing the sauter mean diameter [NEW ADDITION]
-	    virtual const volScalarField& d() const { return d32_; }
-
         //- Correct the phase properties
         virtual void correct();
 
