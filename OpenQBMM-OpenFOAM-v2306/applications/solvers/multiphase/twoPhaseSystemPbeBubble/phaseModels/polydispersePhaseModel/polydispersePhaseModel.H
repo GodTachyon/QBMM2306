@@ -89,7 +89,7 @@ class polydispersePhaseModel
         PtrList<volVectorField>& Us_;
 
         //- List of deviation velocities
-        PtrList<volVectorField> Vs_;
+        //PtrList<volVectorField> Vs_;
 
         //- Scale factor used for diameter
         scalar diameterScale_;
@@ -156,13 +156,13 @@ class polydispersePhaseModel
         scalar coalescenceSource(const label celli, const label momentOrder);
 
         //- Coalescence source
-        vector coalescenceSourceU(const label celli, const label momentOrder);
+        //vector coalescenceSourceU(const label celli, const label momentOrder);
 
         //- Breakup source
         scalar breakupSource(const label celli, const label momentOrder);
 
         //- Breakup source
-        vector breakupSourceU(const label celli, const label momentOrder);
+        //vector breakupSourceU(const label celli, const label momentOrder);
 
         //- Solve ode for breakup and coalescnce
         void solveSourceOde();
@@ -213,7 +213,7 @@ public:
         {
             return d32_;
         }
-	/* [Removed since this is an override from phaseModel.H, we need the default for now]
+	// [Removed since this is an override from phaseModel.H, we need the default for now]
         //- Return the velocity for nodei
         virtual const volVectorField& Us(const label nodei) const
         {
@@ -225,7 +225,7 @@ public:
         {
             return Us_[nodei];
         }
-
+	/*
         //- Return deviation velocity for nodei
         virtual tmp<volVectorField> Vs(const label nodei) const
         {
@@ -242,7 +242,7 @@ public:
         virtual void correct();
 
         //- Relative transport of moments
-        virtual void relativeTransport();
+        //virtual void relativeTransport();
 
         //- Average transport of moments
         virtual void averageTransport(const surfaceScalarField& phiGas); //added call for gas flux [NEW ADDITION]
