@@ -211,7 +211,7 @@ public:
         //  interfacial force models evaluate using d32
         virtual const volScalarField& ds(const label nodei) const
         {
-            return d32_;
+            return ds_[nodei];
         }
 	/* [Removed since this is an override from phaseModel.H, we need the default for now]
         //- Return the velocity for nodei
