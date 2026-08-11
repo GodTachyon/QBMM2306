@@ -153,88 +153,62 @@ void Foam::pbeBubblePhaseModel::correct()
     // polydispersePhaseModel::correct(). Unverified - check
     // quadratureApproximations.H / momentFieldSets.H if this fails to
     // compile.
+    //
+    // This quadrature's abscissa is diameter, not mass (unlike
+    // polydispersePhaseModel's monoKineticQuadratureApproximation), so:
+    //   - ds_[nodei] is the (bounded) abscissa directly - no mass/rho
+    //     conversion.
+    //   - Volume fraction comes from moment 3 (alpha = (pi/6)*moment[3]
+    //     for spherical bubbles), not moment 1, and needs no /rho() since
+    //     d^3 already encodes volume geometrically.
+    //   - d32 = moment[3]/moment[2] directly, no per-node reconstruction
+    //     needed.
+    // ASSUMPTION: this requires the case to track at least moments 0-3.
     const auto& quadrature = pbe_->quadrature();
-
+ 
+    const scalar volCoeff = Foam::constant::mathematical::pi/6.0;
+ 
+    // Raw (unscaled) volume-fraction estimate from moment 3, used to
+    // reconcile alphas_ against the independently-transported alpha1
+    // field, mirroring polydispersePhaseModel's scale factor.
+    volScalarField scale
+    (
+        (*this)/Foam::max(volCoeff*quadrature.moments()[3], residualAlpha_)
+    );
+ 
     d_ = dimensionedScalar("zero", dimLength, 0.0);
-    // 3rd diameter moment. Have to check if this is correct in dimensions
-    volScalarField d32Num
-    (
-        IOobject
-        (
-            "d32Num",
-            fluid_.mesh().time().timeName(),
-            fluid_.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE,
-            false
-        ),
-        fluid_.mesh(),
-        dimensionedScalar
-        (
-            "zero",
-            quadrature.nodes()[0].primaryWeight().dimensions()*pow3(dimLength),
-            0.0
-        )
-    );
-    // 2nd diameter moment. Have to check dimensions.
-    volScalarField d32Den
-    (
-        IOobject
-        (
-            "d32Den",
-            fluid_.mesh().time().timeName(),
-            fluid_.mesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE,
-            false
-        ),
-        fluid_.mesh(),
-        dimensionedScalar
-        (
-            "zero",
-            quadrature.nodes()[0].primaryWeight().dimensions()*sqr(dimLength),
-            0.0
-        )
-    );
-
+ 
     forAll(quadrature.nodes(), nodei)
     {
         const auto& node = quadrature.nodes()[nodei];
-
+ 
+        ds_[nodei] =
+            Foam::min(Foam::max(node.primaryAbscissae()[0], minD_), maxD_);
+ 
         alphas_[nodei] =
-            node.primaryWeight()*node.primaryAbscissae()[0]/rho();
+            volCoeff*node.primaryWeight()*pow3(ds_[nodei])*scale;
         alphas_[nodei].max(0);
         alphas_[nodei].min(1);
-
-        ds_[nodei] =
-            Foam::min
-            (
-                Foam::max
-                (
-                    Foam::pow
-                    (
-                        node.primaryAbscissae()[0]*6.0
-                       /(rho()*Foam::constant::mathematical::pi)
-                      + dimensionedScalar("smallVolume", dimVolume, SMALL),
-                        1.0/3.0
-                    ),
-                    minD_
-                ),
-                maxD_
-            );
-
+ 
         d_ += alphas_[nodei]*ds_[nodei];
-        d32Num += node.primaryWeight()*pow3(ds_[nodei]);
-        d32Den += node.primaryWeight()*sqr(ds_[nodei]);
     }
-
+ 
     d_.max(minD_);
-
+ 
     d32_ =
-        d32Num
-       /Foam::max(d32Den, dimensionedScalar("dSmall", d32Den.dimensions(), SMALL));
+        quadrature.moments()[3]
+       /Foam::max
+        (
+            quadrature.moments()[2],
+            dimensionedScalar
+            (
+                "dSmall",
+                quadrature.moments()[2].dimensions(),
+                SMALL
+            )
+        );
     d32_ = Foam::min(Foam::max(d32_, minD_), maxD_);
-
+ 
     Info<< "d32 (Sauter mean diameter, pbeBubblePhaseModel): min = "
         << Foam::min(d32_).value()
         << " max = " << Foam::max(d32_).value()
