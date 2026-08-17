@@ -35,6 +35,7 @@ EXE_INC = \
     -I$(QBMM_SRC)/quadratureMethods/momentAdvection/lnInclude \
     -I$(QBMM_SRC)/quadratureMethods/PDFTransportModels/lnInclude \
     -I$(QBMM_SRC)/quadratureMethods/populationBalanceModels/lnInclude \
+    -I$(QBMM_SRC)/quadratureMethods/realizableOdeSolver \
     -I$(QBMM_SRC)/Vandermonde/lnInclude
 
 LIB_LIBS = \
