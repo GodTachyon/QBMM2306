@@ -111,7 +111,29 @@ int main(int argc, char *argv[])
                 }
             }
         }
+        /*
+        // [NEW ADDITION] Print moments and dimensions for diagnostics
+        {
+            const polydispersePhaseModel& pbePhase1 =
+                refCast<const polydispersePhaseModel>(phase1);
 
+            const volScalarMomentFieldSet& moments1 =
+                pbePhase1.quadrature().moments();
+
+            Info<< "Phase1 moments:" << endl;
+            forAll(moments1, mi)
+            {
+                const volScalarField& m = moments1[mi];
+                Info<< "    " << m.name()
+                    << "  dims: " << m.dimensions()
+                    << "  min: " << Foam::min(m).value()
+                    << "  max: " << Foam::max(m).value()
+                    << "  mean: "
+                    << m.weightedAverage(mesh.V()).value()
+                    << endl;
+            }
+        }
+        */
         runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"

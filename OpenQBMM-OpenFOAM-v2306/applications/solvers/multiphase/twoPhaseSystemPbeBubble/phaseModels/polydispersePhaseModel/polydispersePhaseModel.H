@@ -211,8 +211,15 @@ public:
         //  interfacial force models evaluate using d32
         virtual const volScalarField& ds(const label nodei) const
         {
-            return d32_;
+            return ds_[nodei];
         }
+        
+        //- Return the quadrature approximation [NEW ADDITION for diagnostics]
+        const monoKineticQuadratureApproximation& quadrature() const
+        {
+            return quadrature_;
+        }
+        
 	// [Removed since this is an override from phaseModel.H, we need the default for now]
         //- Return the velocity for nodei
         virtual const volVectorField& Us(const label nodei) const
