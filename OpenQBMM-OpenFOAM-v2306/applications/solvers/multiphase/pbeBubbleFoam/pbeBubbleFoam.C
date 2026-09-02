@@ -109,6 +109,8 @@ int main(int argc, char *argv[])
                     fluid.averageTransport();
                     fluid.correctTurbulence();
                 }
+// Find a better way to use it for both laminar & turbulent cases (only one call)                
+//                fluid.averageTransport(); // solves the pbe if no turbulence
             }
         }
         /*
