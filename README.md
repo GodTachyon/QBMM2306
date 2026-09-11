@@ -1,5 +1,5 @@
 # QBMM2306
-This is a modified version of [OpenQBMM2306]{https://github.com/OpenQBMM/OpenQBMM} software. 
+This is a modified version of [OpenQBMM2306](https://github.com/OpenQBMM/OpenQBMM) software. 
 
 # Objective
 The objective of this dependecy is to develop a univariate solver PBM for two phase gas - liquid system. At its fundamental level this implies changes of the diameter calculation to be based on the Sauter mean diameter, d32 (3rd moment/2nd moment) along with using the gas phase velocity for transporting the moments in physical space. The d32 is also to be used in evaluating the momentum forces on the phases
@@ -16,5 +16,5 @@ To check -
 3. Ensure only necessary source term models are called to prevent run time mismatch between existing solvers.
 4. Quality of life improvements since code is duplicated in some places.
 
-#Acknowledgements
-Credit for origional code - [OpenQBMM2306]{https://github.com/OpenQBMM/OpenQBMM} solver maintained by Alberto Passalacqua.
+# Acknowledgements
+Credit for origional code - [OpenQBMM2306](https://github.com/OpenQBMM/OpenQBMM) solver maintained by Alberto Passalacqua.
