@@ -41,6 +41,9 @@ Description
 #include "twoPhaseSystemPbeBubble.H"
 #include "PhaseCompressibleTurbulenceModel.H"
 #include "fixedValueFvsPatchFields.H"
+#include "pbeBubblePhaseModel.H"
+#include "univariateMomentSet.H"
+#include "momentFieldSets.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -102,40 +105,21 @@ int main(int argc, char *argv[])
                 #include "pU/UEqns.H"
 
                 #include "pU/pEqn.H"
+                
+                // Transport moments with mean gas velocity
+                fluid.averageTransport();
 
                 if (pimple.turbCorr())
                 {
-                    // Transport moments with mean gas velocity
-                    fluid.averageTransport();
+                    
                     fluid.correctTurbulence();
                 }
 // Find a better way to use it for both laminar & turbulent cases (only one call)                
 //                fluid.averageTransport(); // solves the pbe if no turbulence
             }
-        }
-        /*
-        // [NEW ADDITION] Print moments and dimensions for diagnostics
-        {
-            const polydispersePhaseModel& pbePhase1 =
-                refCast<const polydispersePhaseModel>(phase1);
-
-            const volScalarMomentFieldSet& moments1 =
-                pbePhase1.quadrature().moments();
-
-            Info<< "Phase1 moments:" << endl;
-            forAll(moments1, mi)
-            {
-                const volScalarField& m = moments1[mi];
-                Info<< "    " << m.name()
-                    << "  dims: " << m.dimensions()
-                    << "  min: " << Foam::min(m).value()
-                    << "  max: " << Foam::max(m).value()
-                    << "  mean: "
-                    << m.weightedAverage(mesh.V()).value()
-                    << endl;
-            }
-        }
-        */
+       }
+            
+        
         runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"

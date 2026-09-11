@@ -156,6 +156,12 @@ public:
         {
             return ds_[nodei];
         }
+        
+        //- Return the population balance quadrature approximation
+        const scalarQuadratureApproximation& quadrature() const
+        {
+            return pbe_->quadrature();
+        }
 
         //- Correct the phase properties (alphas_, ds_, d32_) from the
         //  PBE's current quadrature
