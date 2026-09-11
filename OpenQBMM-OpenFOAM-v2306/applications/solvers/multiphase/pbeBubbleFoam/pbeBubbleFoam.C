@@ -41,6 +41,9 @@ Description
 #include "twoPhaseSystemPbeBubble.H"
 #include "PhaseCompressibleTurbulenceModel.H"
 #include "fixedValueFvsPatchFields.H"
+#include "pbeBubblePhaseModel.H"
+#include "univariateMomentSet.H"
+#include "momentFieldSets.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -102,16 +105,21 @@ int main(int argc, char *argv[])
                 #include "pU/UEqns.H"
 
                 #include "pU/pEqn.H"
+                
+                // Transport moments with mean gas velocity
+                fluid.averageTransport();
 
                 if (pimple.turbCorr())
                 {
-                    // Transport moments with mean gas velocity
-                    fluid.averageTransport();
+                    
                     fluid.correctTurbulence();
                 }
+// Find a better way to use it for both laminar & turbulent cases (only one call)                
+//                fluid.averageTransport(); // solves the pbe if no turbulence
             }
-        }
-
+       }
+            
+        
         runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"

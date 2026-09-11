@@ -33,7 +33,11 @@
         Info<< "Max Node Courant Number = " << maxNodeCoNum << endl;
     }
 
-
+    // Realizable Courant number for moment advection (population balance)
+    //scalar realizableCoLimit = min(maxCo, fluid.realizableCo());
+    //scalar realizableCoNum = CoNum*maxCo/(realizableCoLimit + SMALL);
+    //CoNum = max(CoNum, realizableCoNum);
+    //Info<< "Max Realizable Courant Number = " << realizableCoNum << endl;
 
 
 }

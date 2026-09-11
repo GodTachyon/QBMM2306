@@ -89,7 +89,7 @@ class polydispersePhaseModel
         PtrList<volVectorField>& Us_;
 
         //- List of deviation velocities
-        PtrList<volVectorField> Vs_;
+        //PtrList<volVectorField> Vs_;
 
         //- Scale factor used for diameter
         scalar diameterScale_;
@@ -156,13 +156,13 @@ class polydispersePhaseModel
         scalar coalescenceSource(const label celli, const label momentOrder);
 
         //- Coalescence source
-        vector coalescenceSourceU(const label celli, const label momentOrder);
+        //vector coalescenceSourceU(const label celli, const label momentOrder);
 
         //- Breakup source
         scalar breakupSource(const label celli, const label momentOrder);
 
         //- Breakup source
-        vector breakupSourceU(const label celli, const label momentOrder);
+        //vector breakupSourceU(const label celli, const label momentOrder);
 
         //- Solve ode for breakup and coalescnce
         void solveSourceOde();
@@ -207,11 +207,20 @@ public:
         }
 
         //- Return the diameter for nodei
+        //  Override to return the Sauter mean diameter so that all
+        //  interfacial force models evaluate using d32
         virtual const volScalarField& ds(const label nodei) const
         {
             return ds_[nodei];
         }
-	/* [Removed since this is an override from phaseModel.H, we need the default for now]
+        
+        //- Return the quadrature approximation [NEW ADDITION for diagnostics]
+        const monoKineticQuadratureApproximation& quadrature() const
+        {
+            return quadrature_;
+        }
+        
+	// [Removed since this is an override from phaseModel.H, we need the default for now]
         //- Return the velocity for nodei
         virtual const volVectorField& Us(const label nodei) const
         {
@@ -223,7 +232,7 @@ public:
         {
             return Us_[nodei];
         }
-
+	/*
         //- Return deviation velocity for nodei
         virtual tmp<volVectorField> Vs(const label nodei) const
         {
@@ -236,14 +245,11 @@ public:
         //- Correct the phase diameter to mean diameter from moments [NEW ADDITION]
         //virtual void correctDiameter();
         
-        // Override base class accessor, for computing the sauter mean diameter [NEW ADDITION]
-	    virtual const volScalarField& d() const { return d32_; }
-
         //- Correct the phase properties
         virtual void correct();
 
         //- Relative transport of moments
-        virtual void relativeTransport();
+        //virtual void relativeTransport();
 
         //- Average transport of moments
         virtual void averageTransport(const surfaceScalarField& phiGas); //added call for gas flux [NEW ADDITION]

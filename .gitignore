@@ -1,6 +1,7 @@
 # Ignore directories
 /run
 /OpenQBMM-OpenFOAM-v2306/validation
+/OpenQBMM-OpenFOAM-v2306/test
 /OpenQBMM-OpenFOAM-v2306/tree.txt
 tree.txt
 treeV2.txt

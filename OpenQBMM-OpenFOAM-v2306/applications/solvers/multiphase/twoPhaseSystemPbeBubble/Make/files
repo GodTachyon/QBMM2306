@@ -3,6 +3,7 @@ phaseModels/phaseModel/newPhaseModel.C
 phaseModels/polydispersePhaseModel/polydispersePhaseModel.C
 phaseModels/polydispersePhaseModel/fixedFace/fixedFaceFvPatchScalarField.C
 phaseModels/phaseModel/phaseModels.C
+phaseModels/pbeBubblePhaseModel/pbeBubblePhaseModel.C
 
 phaseModels/polydispersePhaseModel/coalescenceFrequencyKernels/CoulaloglouAndTavlarides/CoulaloglouAndTavlaridesFrequency.C
 phaseModels/polydispersePhaseModel/coalescenceFrequencyKernels/PrinceAndBlanch/PrinceAndBlanchFrequency.C

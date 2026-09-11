@@ -113,7 +113,7 @@ Foam::scalar Foam::polydispersePhaseModel::coalescenceSource
     }
     return cSource;
 }
-
+/*
 Foam::vector Foam::polydispersePhaseModel::coalescenceSourceU
 (
     const label celli,
@@ -169,7 +169,7 @@ Foam::vector Foam::polydispersePhaseModel::coalescenceSourceU
 
     return cmptMultiply(cSource, validDirections_);
 }
-
+*/
 
 Foam::scalar Foam::polydispersePhaseModel::breakupSource
 (
@@ -208,7 +208,7 @@ Foam::scalar Foam::polydispersePhaseModel::breakupSource
     return bSource;
 }
 
-
+/*
 Foam::vector Foam::polydispersePhaseModel::breakupSourceU
 (
     const label celli,
@@ -245,7 +245,7 @@ Foam::vector Foam::polydispersePhaseModel::breakupSourceU
 
     return cmptMultiply(bSource, validDirections_);
 }
-
+*/
 void Foam::polydispersePhaseModel::solveSourceOde()
 {
     if (!coalescence_ && !breakup_)
@@ -258,8 +258,8 @@ void Foam::polydispersePhaseModel::solveSourceOde()
 
     volScalarMomentFieldSet& moments = quadrature_.moments();
     label nMoments = quadrature_.nMoments();
-    PtrList<volVectorField>& Ups = quadrature_.velocityMoments();
-    label nVelocityMoments = Ups.size();
+//    PtrList<volVectorField>& Ups = quadrature_.velocityMoments();
+//    label nVelocityMoments = Ups.size();
 
     scalar globalDt = moments[0].mesh().time().deltaT().value();
 
@@ -276,7 +276,7 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                         + breakupSource(celli, mi)
                     );
             }
-
+            /*
             forAll(Ups, mi)
             {
                 Ups[mi][celli] +=
@@ -285,7 +285,7 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                         coalescenceSourceU(celli, mi)
                       + breakupSourceU(celli, mi)
                     );
-            }
+            }*/
         }
         return;
     }
@@ -301,15 +301,15 @@ void Foam::polydispersePhaseModel::solveSourceOde()
         }
 
         scalarField oldMoments(nMoments, Zero);
-        vectorField oldUps(nVelocityMoments, Zero);
+      //  vectorField oldUps(nVelocityMoments, Zero);
         forAll(oldMoments, mi)
         {
             oldMoments[mi] = moments[mi][celli];
-        }
+        }/*
         forAll(oldUps, mi)
         {
             oldUps[mi] = Ups[mi][celli];
-        }
+        }*/
 
         //- Local time
         scalar localT = 0.0;
@@ -321,11 +321,11 @@ void Foam::polydispersePhaseModel::solveSourceOde()
         scalarField k1(nMoments_, Zero);
         scalarField k2(nMoments_, Zero);
         scalarField k3(nMoments_, Zero);
-
+        /*
         vectorField k1U(nVelocityMoments, Zero);
         vectorField k2U(nVelocityMoments, Zero);
         vectorField k3U(nVelocityMoments, Zero);
-
+        */
         // Flag to indicate if the time step is complete
         bool timeComplete = false;
 
@@ -365,7 +365,7 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                 {
                     break;
                 }
-
+                /*
                 forAll(oldUps, mi)
                 {
                     k1U[mi] =
@@ -375,7 +375,7 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                           + breakupSourceU(celli, mi)
                         );
                     Ups[mi][celli] = oldUps[mi] + k1U[mi];
-                }
+                }*/
                 realizableUpdate1 =
                         quadrature_.updateAllLocalQuadrature(celli, false);
 
@@ -390,7 +390,7 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                         );
                     moments[mi][celli] = oldMoments[mi] + (k1[mi] + k2[mi])/4.0;
                     momentsSecondStep[mi] = moments[mi][celli];
-                }
+                }/*
                 forAll(oldUps, mi)
                 {
                     k2U[mi] =
@@ -400,7 +400,7 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                           + breakupSourceU(celli, mi)
                         );
                     Ups[mi][celli] = oldUps[mi] + (k1U[mi] + k2U[mi])/4.0;
-                }
+                }*/
                 realizableUpdate2 =
                         quadrature_.updateAllLocalQuadrature(celli, false);
 
@@ -415,7 +415,7 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                         );
                     moments[mi][celli] =
                         oldMoments[mi] + (k1[mi] + k2[mi] + 4.0*k3[mi])/6.0;
-                }
+                }/*
                 forAll(oldUps, mi)
                 {
                     k3U[mi] =
@@ -426,7 +426,7 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                         );
                     Ups[mi][celli] =
                         oldUps[mi] + (k1U[mi] + k2U[mi] + 4.0*k3U[mi])/6.0;
-                }
+                }*/
                 realizableUpdate3 =
                         quadrature_.updateAllLocalQuadrature(celli, false);
 
@@ -442,11 +442,11 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                     forAll(oldMoments, mi)
                     {
                         moments[mi][celli] = oldMoments[mi];
-                    }
+                    }/*
                     forAll(oldUps, mi)
                     {
                         Ups[mi][celli] = oldUps[mi];
-                    }
+                    }*/
 
                     // Updating local quadrature with old moments
                     quadrature_.updateAllLocalQuadrature(celli);
@@ -514,11 +514,11 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                 forAll(oldMoments, mi)
                 {
                     oldMoments[mi] = moments[mi][celli];
-                }
+                }/*
                 forAll(oldUps, mi)
                 {
                     oldUps[mi] = Ups[mi][celli];
-                }
+                }*/
 
                 if (localDt == 0.0)
                 {
@@ -534,11 +534,11 @@ void Foam::polydispersePhaseModel::solveSourceOde()
                 forAll(oldMoments, mi)
                 {
                     moments[mi][celli] = oldMoments[mi];
-                }
+                }/*
                 forAll(oldUps, mi)
                 {
                     Ups[mi][celli] = oldUps[mi];
-                }
+                }*/
                 quadrature_.updateAllLocalQuadrature(celli);
 
                 if (localDt < minLocalDt_)
@@ -589,7 +589,7 @@ Foam::polydispersePhaseModel::polydispersePhaseModel
     nMoments_(quadrature_.nMoments()),
     alphas_(nNodes_),
     Us_(quadrature_.velocities()),
-    Vs_(nNodes_),
+//    Vs_(nNodes_),
     ds_(nNodes_),
     maxD_("maxD", dimLength, phaseDict_),
     minD_("minD", dimLength, phaseDict_),
@@ -668,7 +668,7 @@ Foam::polydispersePhaseModel::polydispersePhaseModel
                 dimensionedScalar("alpha", dimless, 0.0)
             )
         );
-
+/*
         Vs_.set
         (
             nodei,
@@ -694,7 +694,7 @@ Foam::polydispersePhaseModel::polydispersePhaseModel
                 dimensionedVector("zeroV", dimVelocity, Zero)
             )
         );
-
+*/
         ds_.set
         (
             nodei,
@@ -988,7 +988,7 @@ void Foam::polydispersePhaseModel::correct()
             << " m" << endl;
     }
 }
-
+/*
 void Foam::polydispersePhaseModel::relativeTransport()
 {
     // Do nothing if only mean is used
@@ -1127,7 +1127,7 @@ void Foam::polydispersePhaseModel::relativeTransport()
     quadrature_.updateAllQuadrature();
     correct();
 }
-
+*/
 
 void Foam::polydispersePhaseModel::averageTransport
 (
@@ -1279,12 +1279,12 @@ void Foam::polydispersePhaseModel::averageTransport
 
     // Update moments with breakup and coalescence sources
     solveSourceOde();
-
+    /*
     // Update deviation velocity
     forAll(Vs_, nodei)
     {
         Vs_[nodei] = Us_[nodei] - U_;
-    }
+    }*/
 }
 
 

@@ -2,11 +2,11 @@
 cd "${0%/*}" || exit                            # Run from this directory
 #------------------------------------------------------------------------------
 
-wclean libso twoPhaseSystem
+#wclean libso twoPhaseSystem
 wclean libso twoPhaseSystemPbeBubble
 wclean libso pbeBubbleFoam
-wclean libso interfacialModels
-wclean libso phaseCompressibleTurbulenceModels
-wclean libso polydisperseBubbleFoam
+#wclean libso interfacialModels
+#wclean libso phaseCompressibleTurbulenceModels
+#wclean libso polydisperseBubbleFoam
 
 #------------------------------------------------------------------------------

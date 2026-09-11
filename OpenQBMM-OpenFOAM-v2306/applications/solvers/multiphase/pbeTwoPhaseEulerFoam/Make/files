@@ -1,0 +1,17 @@
+diameter = diameterModels
+$(diameter)/diameterModel/diameterModel.C
+$(diameter)/constantDiameter/constantDiameter.C
+$(diameter)/isothermalDiameter/isothermalDiameter.C
+$(diameter)/populationBalanceDiameter/populationBalanceDiameter.C
+
+diameterModels/IATE/IATE.C
+
+IATEsources = diameterModels/IATE/IATEsources
+$(IATEsources)/IATEsource/IATEsource.C
+$(IATEsources)/wakeEntrainmentCoalescence/wakeEntrainmentCoalescence.C
+$(IATEsources)/turbulentBreakUp/turbulentBreakUp.C
+$(IATEsources)/randomCoalescence/randomCoalescence.C
+
+pbeTwoPhaseEulerFoam.C
+
+EXE = $(FOAM_MODULE_APPBIN)/pbeTwoPhaseEulerFoam
